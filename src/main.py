@@ -20,7 +20,7 @@ board_size = 5
 # choose the double agent's team
 RED = True
 BLUE = False
-double_agent = RED
+double_agent = bool(random.getrandbits(1))
 
 # number of cards to guess for each team
 nr_red_agents = 8
@@ -33,19 +33,19 @@ else:
     nr_blue_agents += 1
 
 # set colors and their rgb-code
-red = 'firebrick3'
+red = 'red3'
 green = 'yellow green'
 blue = 'navy'
 black = 'black'
 white = 'white'
 grey = 'grey'
 color_code = dict()
-color_code[red] = np.asarray([178, 34, 34])
+color_code[red] = np.asarray([200, 0, 0])
 color_code[green] = np.asarray([154, 205, 50])
 color_code[blue] = np.asarray([0, 0, 128])
 color_code[black] = np.asarray([20, 20, 20])
 color_code[white] = np.asarray([255, 255, 255])
-color_code[grey] = np.asarray([230, 230, 230])
+color_code[grey] = np.asarray([240, 240, 240])
 
 
 def add_colors(color_list, nr, color):
@@ -75,15 +75,15 @@ board_color_array = np.asarray(board_color_list)
 board_color_array = np.reshape(board_color_array, (board_size, board_size))
 
 # create the image for the intelligence chiefs
-board_color_image = np.zeros(shape=(250, 250, 3), dtype=np.uint8)
+board_color_image = np.zeros(shape=(500, 500, 3), dtype=np.uint8)
 for row in range(board_color_image.shape[0]):
     for col in range(board_color_image.shape[1]):
-        if row % 50 < 4 or row % 50 > 45:
+        if row % 100 < 5 or row % 100 > 94:
             board_color_image[row, col] = color_code['grey']
-        elif col % 50 < 4 or col % 50 > 45:
+        elif col % 100 < 5 or col % 100 > 94:
             board_color_image[row, col] = color_code['grey']
         else:
-            board_color_image[row, col] = color_code[board_color_array[row // 50, col // 50]]
+            board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
 board_color_image = Image.fromarray(board_color_image, 'RGB')
 board_color_image.save(image_path, 'PNG')
 
