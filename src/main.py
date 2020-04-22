@@ -6,6 +6,7 @@ import numpy as np
 import random
 from PIL import Image
 import os
+import csv
 
 """
 Emulates the game 'Codenames' to play remotely with friends via skype. 
@@ -13,6 +14,7 @@ Emulates the game 'Codenames' to play remotely with friends via skype.
 
 # path to save the image for the intelligence chiefs
 image_path = os.path.expanduser("~/Dropbox/CoronaCodenames/Farbzuordnung.png")
+codenames_path = os.path.expanduser("../dat/codenames.csv")
 
 # board size
 board_size = 5
@@ -88,18 +90,34 @@ board_color_image = Image.fromarray(board_color_image, 'RGB')
 board_color_image.save(image_path, 'PNG')
 
 # create the list of words in the game
-word_list = ["Hund", "Feuer", "Wald", "Clownfisch", "Tisch",
-             "Turm", "Stahl", "Schwert", "Schinken", "Kirsche",
-             "Sport", "Mirkoskop", "Handy", "Student", "Gras",
-             "Gericht", "Amerika", "Hut", "Nachspeise", "Nuss",
-             "Tulpe", "Kugel", "Spannung", "Mond", "Biologie"]
-# word_list = list()
-# for i in range(25):
-#     word = 'word' + str(i+1)
-#     word_list.append(word)
+# word_list = ["LAGER", "HAND", "BROETCHEN", "HAUPT", "EINHORN",
+#              "STRUDEL", "ANWALT", "KNOPF", "BOGEN", "GANG",
+#              "JAEGER", "MOOS", "LEIM", "TURM", "BART",
+#              "RUECKEN", "KRONE", "BOXER", "BOCK", "ROEMER",
+#              "PO", "ATLAS", "STAR", "CHEMIE", "ARM"]
+
+# read all names from file
+word_list = []
+with open(codenames_path, 'r') as file:
+    reader = csv.reader(file, delimiter=';')
+
+    # skip the header
+    next(reader)
+    for row in reader:
+        word_list.append(row[1])
+
+# find length of the longest word
+# longest = 0
+# for word in word_list:
+#     if len(word) > longest:
+#         longest = len(word)
+# print(longest)
 
 # shuffle the words to get a random game board
 random.shuffle(word_list)
+
+# take the first 25 words only
+word_list = word_list[:board_size*board_size]
 
 # create a 5x5 array out of the words
 word_array = np.asarray(word_list)
@@ -131,32 +149,32 @@ class App:
             for col in range(word_array.shape[1]):
                 self.button_array[row, col] = tk.Button(frame,
                                                         text=word_array[row, col],
-                                                        width=16,
+                                                        width=14,
                                                         height=5,
                                                         fg=black,
                                                         highlightthickness=4,
-                                                        font=("Courier", 12, 'bold'),
+                                                        font=("Courier", 14, 'bold'),
                                                         command=lambda r=row, c=col: self.callback(r, c))
                 self.button_array[row, col].grid(row=row, column=col, padx=self.padx, pady=self.pady)
 
         # label for the remaining cards of team red
         self.red_label = tk.Label(frame,
-                                  text='Rot: ' + str(self.red_cnt),
+                                  text='ROT: ' + str(self.red_cnt),
                                   fg=red,
                                   anchor='w',
-                                  width=10,
+                                  width=8,
                                   height=2,
-                                  font=("Courier", 16, 'bold'))
+                                  font=("Courier", 18, 'bold'))
         self.red_label.grid(row=5, column=0, padx=self.padx, pady=self.pady)
 
         # label for the remaining cards of team blue
         self.blue_label = tk.Label(frame,
-                                  text='Blau: ' + str(self.blue_cnt),
-                                  fg=blue,
-                                  anchor='w',
-                                  width=10,
-                                  height=2,
-                                  font=("Courier", 16, 'bold'))
+                                   text='BLAU: ' + str(self.blue_cnt),
+                                   fg=blue,
+                                   anchor='w',
+                                   width=8,
+                                   height=2,
+                                   font=("Courier", 18, 'bold'))
         self.blue_label.grid(row=5, column=1, padx=self.padx, pady=self.pady)
 
         # label for game termination
@@ -166,7 +184,7 @@ class App:
                                      anchor='e',
                                      width=18,
                                      height=2,
-                                     font=("Courier", 20, 'bold'))
+                                     font=("Courier", 18, 'bold'))
         self.winner_label.grid(row=5, column=3, columnspan=2, padx=self.padx, pady=self.pady)
 
     def callback(self, row, col):
