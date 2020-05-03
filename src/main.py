@@ -13,11 +13,12 @@ Emulates the game 'Codenames' to play remotely with friends via skype.
 """
 
 # path to save the image for the intelligence chiefs
-image_path = os.path.expanduser("~/Dropbox/CoronaCodenames/Farbzuordnung.png")
+image_path = os.path.expanduser("~/Dropbox/CoronaCodenames/Farbzuordnung_v0.png")
 codenames_path = os.path.expanduser("../dat/codenames.csv")
 
 # board size
 board_size = 5
+font_size = 20
 
 # choose the double agent's team
 RED = True
@@ -77,7 +78,7 @@ board_color_array = np.asarray(board_color_list)
 board_color_array = np.reshape(board_color_array, (board_size, board_size))
 
 # create the image for the intelligence chiefs
-board_color_image = np.zeros(shape=(500, 500, 3), dtype=np.uint8)
+board_color_image = np.zeros(shape=(board_size*100, board_size*100, 3), dtype=np.uint8)
 for row in range(board_color_image.shape[0]):
     for col in range(board_color_image.shape[1]):
         if row % 100 < 5 or row % 100 > 94:
@@ -88,13 +89,6 @@ for row in range(board_color_image.shape[0]):
             board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
 board_color_image = Image.fromarray(board_color_image, 'RGB')
 board_color_image.save(image_path, 'PNG')
-
-# create the list of words in the game
-# word_list = ["LAGER", "HAND", "BROETCHEN", "HAUPT", "EINHORN",
-#              "STRUDEL", "ANWALT", "KNOPF", "BOGEN", "GANG",
-#              "JAEGER", "MOOS", "LEIM", "TURM", "BART",
-#              "RUECKEN", "KRONE", "BOXER", "BOCK", "ROEMER",
-#              "PO", "ATLAS", "STAR", "CHEMIE", "ARM"]
 
 # read all names from file
 word_list = []
@@ -137,6 +131,7 @@ class App:
         # padding
         self.padx = 2
         self.pady = 2
+        self.font_size = font_size
 
         # number of remaining red and blue cards
         self.red_cnt = nr_red_agents
@@ -153,7 +148,7 @@ class App:
                                                         height=5,
                                                         fg=black,
                                                         highlightthickness=4,
-                                                        font=("Courier", 14, 'bold'),
+                                                        font=("Courier", self.font_size, 'bold'),
                                                         command=lambda r=row, c=col: self.callback(r, c))
                 self.button_array[row, col].grid(row=row, column=col, padx=self.padx, pady=self.pady)
 
@@ -162,30 +157,30 @@ class App:
                                   text='ROT: ' + str(self.red_cnt),
                                   fg=red,
                                   anchor='w',
-                                  width=8,
+                                  width=12,
                                   height=2,
-                                  font=("Courier", 18, 'bold'))
-        self.red_label.grid(row=5, column=0, padx=self.padx, pady=self.pady)
+                                  font=("Courier", self.font_size, 'bold'))
+        self.red_label.grid(row=board_size, column=0, padx=self.padx, pady=self.pady)
 
         # label for the remaining cards of team blue
         self.blue_label = tk.Label(frame,
                                    text='BLAU: ' + str(self.blue_cnt),
                                    fg=blue,
                                    anchor='w',
-                                   width=8,
+                                   width=12,
                                    height=2,
-                                   font=("Courier", 18, 'bold'))
-        self.blue_label.grid(row=5, column=1, padx=self.padx, pady=self.pady)
+                                   font=("Courier", self.font_size, 'bold'))
+        self.blue_label.grid(row=board_size, column=1, padx=self.padx, pady=self.pady)
 
         # label for game termination
         self.winner_label = tk.Label(frame,
                                      text='',
                                      fg=black,
                                      anchor='e',
-                                     width=18,
+                                     width=24,
                                      height=2,
-                                     font=("Courier", 18, 'bold'))
-        self.winner_label.grid(row=5, column=3, columnspan=2, padx=self.padx, pady=self.pady)
+                                     font=("Courier", self.font_size, 'bold'))
+        self.winner_label.grid(row=board_size, column=board_size-2, columnspan=2, padx=self.padx, pady=self.pady)
 
     def callback(self, row, col):
         """
