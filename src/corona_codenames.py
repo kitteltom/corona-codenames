@@ -10,7 +10,7 @@ import csv
 import argparse
 
 """
-Emulates the game 'Codenames' to play remotely with friends via skype. 
+Emulates the game 'Codenames' to play remotely with friends via video conference. 
 """
 
 # parser for command line arguments
