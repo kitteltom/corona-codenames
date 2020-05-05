@@ -7,33 +7,22 @@ import random
 from PIL import Image
 import os
 import csv
+import argparse
 
 """
 Emulates the game 'Codenames' to play remotely with friends via skype. 
 """
 
-# path to save the image for the intelligence chiefs
-image_path = os.path.expanduser("~/Dropbox/CoronaCodenames/Farbzuordnung_v0.png")
-codenames_path = os.path.expanduser("../dat/codenames.csv")
-
-# board size
-board_size = 5
-font_size = 20
-
-# choose the double agent's team
-RED = True
-BLUE = False
-double_agent = bool(random.getrandbits(1))
-
-# number of cards to guess for each team
-nr_red_agents = 8
-nr_blue_agents = 8
-nr_rubbernecks = 7
-nr_murderers = 1
-if double_agent is RED:
-    nr_red_agents += 1
-else:
-    nr_blue_agents += 1
+# parser for command line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--font_size', type=int, default=20,
+                    help='Font size of the words in the game. Change to make game better visible for other players. '
+                         'Note: This also changes the overall size of the game window.')
+parser.add_argument('-d', '--data_path', default='../dat/codenames.csv',
+                    help='Path to the csv-file where the available words for the game are saved.')
+parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames/Farbzuordnung_v0.png',
+                    help='Path to save the image for the intelligence chiefs. Ideally this is a synced cloud folder, '
+                         'which can be shared with other players.')
 
 # set colors and their rgb-code
 red = 'red3'
@@ -51,6 +40,91 @@ color_code[white] = np.asarray([255, 255, 255])
 color_code[grey] = np.asarray([240, 240, 240])
 
 
+def launch_game(args):
+    # read the arguments
+    font_size = args.font_size
+    codenames_path = os.path.expanduser(args.data_path)
+    image_path = os.path.expanduser(args.cloud_path)
+
+    # size of the game (number of cards in a row/column)
+    board_size = 5
+
+    # choose the double agent's team
+    RED = True
+    BLUE = False
+    double_agent = bool(random.getrandbits(1))
+
+    # number of cards to guess for each team
+    nr_red_agents = 8
+    nr_blue_agents = 8
+    nr_rubbernecks = 7
+    nr_murderers = 1
+    if double_agent == RED:
+        nr_red_agents += 1
+    elif double_agent == BLUE:
+        nr_blue_agents += 1
+
+    # build the list of possible board colors
+    board_color_list = list()
+    add_colors(board_color_list, nr_red_agents, red)
+    add_colors(board_color_list, nr_blue_agents, blue)
+    add_colors(board_color_list, nr_rubbernecks, green)
+    add_colors(board_color_list, nr_murderers, black)
+
+    # shuffle the colors to get a random game board
+    random.shuffle(board_color_list)
+
+    # create a 5x5 array out of the board colors
+    board_color_array = np.asarray(board_color_list)
+    board_color_array = np.reshape(board_color_array, (board_size, board_size))
+
+    # create the image for the intelligence chiefs
+    board_color_image = np.zeros(shape=(board_size*100, board_size*100, 3), dtype=np.uint8)
+    for row in range(board_color_image.shape[0]):
+        for col in range(board_color_image.shape[1]):
+            if row % 100 < 5 or row % 100 > 94:
+                board_color_image[row, col] = color_code['grey']
+            elif col % 100 < 5 or col % 100 > 94:
+                board_color_image[row, col] = color_code['grey']
+            else:
+                board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
+    board_color_image = Image.fromarray(board_color_image, 'RGB')
+    board_color_image.save(image_path, 'PNG')
+
+    # read all names from file
+    word_list = []
+    with open(codenames_path, 'r') as file:
+        reader = csv.reader(file, delimiter=';')
+
+        # skip the header
+        next(reader)
+        for row in reader:
+            word_list.append(row[1])
+
+    # find length of the longest word
+    # longest = 0
+    # for word in word_list:
+    #     if len(word) > longest:
+    #         longest = len(word)
+    # print(longest)
+
+    # shuffle the words to get a random game board
+    random.shuffle(word_list)
+
+    # take the first 25 words only
+    word_list = word_list[:board_size*board_size]
+
+    # create a 5x5 array out of the words
+    word_array = np.asarray(word_list)
+    word_array = np.reshape(word_array, (board_size, board_size))
+
+    # sets up the GUI
+    root = tk.Tk()
+    root.title("CoronaCodenames")
+    app = App(root, font_size, board_size, nr_red_agents, nr_blue_agents, word_array, board_color_array)
+    root.mainloop()
+
+
 def add_colors(color_list, nr, color):
     """
     takes a list of color strings and appends 'nr' strings of 'color'
@@ -63,67 +137,12 @@ def add_colors(color_list, nr, color):
         color_list.append(color)
 
 
-# build the list of possible board colors
-board_color_list = list()
-add_colors(board_color_list, nr_red_agents, red)
-add_colors(board_color_list, nr_blue_agents, blue)
-add_colors(board_color_list, nr_rubbernecks, green)
-add_colors(board_color_list, nr_murderers, black)
-
-# shuffle the colors to get a random game board
-random.shuffle(board_color_list)
-
-# create a 5x5 array out of the board colors
-board_color_array = np.asarray(board_color_list)
-board_color_array = np.reshape(board_color_array, (board_size, board_size))
-
-# create the image for the intelligence chiefs
-board_color_image = np.zeros(shape=(board_size*100, board_size*100, 3), dtype=np.uint8)
-for row in range(board_color_image.shape[0]):
-    for col in range(board_color_image.shape[1]):
-        if row % 100 < 5 or row % 100 > 94:
-            board_color_image[row, col] = color_code['grey']
-        elif col % 100 < 5 or col % 100 > 94:
-            board_color_image[row, col] = color_code['grey']
-        else:
-            board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
-board_color_image = Image.fromarray(board_color_image, 'RGB')
-board_color_image.save(image_path, 'PNG')
-
-# read all names from file
-word_list = []
-with open(codenames_path, 'r') as file:
-    reader = csv.reader(file, delimiter=';')
-
-    # skip the header
-    next(reader)
-    for row in reader:
-        word_list.append(row[1])
-
-# find length of the longest word
-# longest = 0
-# for word in word_list:
-#     if len(word) > longest:
-#         longest = len(word)
-# print(longest)
-
-# shuffle the words to get a random game board
-random.shuffle(word_list)
-
-# take the first 25 words only
-word_list = word_list[:board_size*board_size]
-
-# create a 5x5 array out of the words
-word_array = np.asarray(word_list)
-word_array = np.reshape(word_array, (board_size, board_size))
-
-
 class App:
     """
     builds the GUI for the game
     """
 
-    def __init__(self, master):
+    def __init__(self, master, font_size, board_size, nr_red_agents, nr_blue_agents, word_array, board_color_array):
 
         frame = tk.Frame(master)
         frame.pack()
@@ -149,7 +168,8 @@ class App:
                                                         fg=black,
                                                         highlightthickness=4,
                                                         font=("Courier", self.font_size, 'bold'),
-                                                        command=lambda r=row, c=col: self.callback(r, c))
+                                                        command=lambda r=row, c=col: self.callback(r, c,
+                                                                                                   board_color_array))
                 self.button_array[row, col].grid(row=row, column=col, padx=self.padx, pady=self.pady)
 
         # label for the remaining cards of team red
@@ -182,7 +202,7 @@ class App:
                                      font=("Courier", self.font_size, 'bold'))
         self.winner_label.grid(row=board_size, column=board_size-2, columnspan=2, padx=self.padx, pady=self.pady)
 
-    def callback(self, row, col):
+    def callback(self, row, col, board_color_array):
         """
         callback function for pressed buttons: button changes
         colors according to board_color_array + numbers for
@@ -190,6 +210,7 @@ class App:
 
         :param row: row of the button pressed
         :param col: column of the button pressed
+        :param board_color_array: the color for each field
         """
 
         # get the button's underlying color
@@ -217,8 +238,5 @@ class App:
             self.game_over = True
 
 
-# sets up the GUI
-root = tk.Tk()
-root.title("CoronaCodenames")
-app = App(root)
-root.mainloop()
+if __name__ == '__main__':
+    launch_game(parser.parse_args())
