@@ -20,9 +20,12 @@ parser.add_argument('-f', '--font_size', type=int, default=20,
                          'Note: This also changes the overall size of the game window.')
 parser.add_argument('-d', '--data_path', default='../dat/codenames.csv',
                     help='Path to the csv-file where the available words for the game are saved.')
-parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames/Farbzuordnung_v0.png',
+parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames',
                     help='Path to save the image for the intelligence chiefs. Ideally this is a synced cloud folder, '
                          'which can be shared with other players.')
+parser.add_argument('-v', '--version', type=int, default=0,
+                    help='Version number in the naming of the image for the intelligence chiefs. '
+                         'Helpful when playing several rounds in a row.')
 
 # set colors and their rgb-code
 red = 'red3'
@@ -45,6 +48,7 @@ def launch_game(args):
     font_size = args.font_size
     codenames_path = os.path.expanduser(args.data_path)
     image_path = os.path.expanduser(args.cloud_path)
+    image_path = os.path.join(image_path, 'Farbzuordnung_v%d.png' % args.version)
 
     # size of the game (number of cards in a row/column)
     board_size = 5
