@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--font_size', type=int, default=20,
                     help='Font size of the words in the game. Change to make game better visible for other players. '
                          'Note: This also changes the overall size of the game window.')
-parser.add_argument('-d', '--data_path', default='../dat/codenames.csv',
+parser.add_argument('-d', '--data_path', default='../dat',
                     help='Path to the csv-file where the available words for the game are saved.')
 parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames',
                     help='Path to save the image for the intelligence chiefs. Ideally this is a synced cloud folder, '
@@ -46,7 +46,9 @@ color_code[grey] = np.asarray([240, 240, 240])
 def launch_game(args):
     # read the arguments
     font_size = args.font_size
-    codenames_path = os.path.expanduser(args.data_path)
+    data_path = os.path.expanduser(args.data_path)
+    codenames_path = os.path.join(data_path, 'codenames.csv')
+    used_names_path = os.path.join(data_path, 'used_names.csv')
     image_path = os.path.expanduser(args.cloud_path)
     image_path = os.path.join(image_path, 'Farbzuordnung_v%d.png' % args.version)
 
@@ -96,14 +98,7 @@ def launch_game(args):
     board_color_image.save(image_path, 'PNG')
 
     # read all names from file
-    word_list = []
-    with open(codenames_path, 'r') as file:
-        reader = csv.reader(file, delimiter=';')
-
-        # skip the header
-        next(reader)
-        for row in reader:
-            word_list.append(row[1])
+    word_list = read_words(codenames_path)
 
     # find length of the longest word
     # longest = 0
@@ -112,11 +107,30 @@ def launch_game(args):
     #         longest = len(word)
     # print(longest)
 
+    # read all previously used names
+    used_word_list = read_words(used_names_path)
+    if len(word_list) - len(used_word_list) < board_size * board_size:
+        used_word_list = []
+
+    # delete already used words from word list
+    for used_word in used_word_list:
+        word_list.remove(used_word)
+
     # shuffle the words to get a random game board
     random.shuffle(word_list)
 
     # take the first 25 words only
     word_list = word_list[:board_size*board_size]
+    used_word_list += word_list
+
+    # add words to used words
+    with open(used_names_path, 'w') as file:
+        writer = csv.writer(file, delimiter=';')
+
+        # write the header
+        writer.writerow(['Nr', 'Name'])
+        for i, word in enumerate(used_word_list):
+            writer.writerow([str(i + 1), word])
 
     # create a 5x5 array out of the words
     word_array = np.asarray(word_list)
@@ -139,6 +153,19 @@ def add_colors(color_list, nr, color):
     """
     for _ in range(nr):
         color_list.append(color)
+
+
+def read_words(csv_path):
+    word_list = []
+    with open(csv_path, 'r') as file:
+        reader = csv.reader(file, delimiter=';')
+
+        # skip the header
+        next(reader)
+        for row in reader:
+            word_list.append(row[1])
+
+    return word_list
 
 
 class App:
