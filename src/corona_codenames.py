@@ -108,7 +108,9 @@ def launch_game(args):
     # print(longest)
 
     # read all previously used names
-    used_word_list = read_words(used_names_path)
+    used_word_list = []
+    if os.path.isfile(used_names_path):
+        used_word_list = read_words(used_names_path)
     if len(word_list) - len(used_word_list) < board_size * board_size:
         used_word_list = []
 

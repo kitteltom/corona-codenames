@@ -131,3 +131,5 @@ dmypy.json
 # Manually added
 .DS_Store
 .idea/
+dat/used_names.csv
+dat/Farbzuordnung_v*
