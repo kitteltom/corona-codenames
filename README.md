@@ -26,7 +26,7 @@ Make sure you are familiar with the rules of the game [Codenames](https://de.wik
 
 Assuming you are in a video conference together with some friends you can launch this script (see above) and share your screen. With the flag `-f` you can set the size of the game-window such that it fits properly to your screen and the others can see everything. 
 
-### Cloud folder
+### Cloud folder and 'Farbzuordnung'
 
 The flag `-c` sets the path to a folder that is synced with a cloud. After executing the script this folder will contain the file `Farbzuordnung_v<version>.png`, where `<version>` is set with the flag `-v`. This file shows the color of each card on the game-window. Share this folder with the other players. The 'Geheimdienstchefs' in the current game should be the only ones viewing this file. 
 
