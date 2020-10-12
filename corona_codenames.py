@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--font_size', type=int, default=20,
                     help='Font size of the words in the game. Change to make game better visible for other players. '
                          'Note: This also changes the overall size of the game window.')
-parser.add_argument('-d', '--data_path', default='../dat',
+parser.add_argument('-d', '--data_path', default='dat',
                     help='Path to the csv-file where the available words for the game are saved.')
 parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames',
                     help='Path to save the image for the intelligence chiefs. Ideally this is a synced cloud folder, '
