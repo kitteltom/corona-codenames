@@ -8,7 +8,6 @@ The game was developed and testet with Python3.7 on MacOS.
 After cloning this repository you can launch the game with
 
 ```bash
-cd $PWD/src
 python corona_codenames.py -f 20 -v 0 -c path/to/your/desired/cloud/folder
 ```
 
@@ -17,7 +16,6 @@ where `-f` sets the desired font size and therefore the size of the game-window,
 For help on the command line arguments simply execute
 
 ```bash
-cd $PWD/src
 python corona_codenames.py --help
 ```
 
