@@ -2,6 +2,10 @@
 
 Emulates the game [Codenames](https://de.wikipedia.org/wiki/Codenames) to play remotely with friends via video conference. 
 
+The following image shows the game board. 
+
+![Board](board.png)
+
 The game was developed and testet with Python3.7 on MacOS. 
 
 ## How to start
