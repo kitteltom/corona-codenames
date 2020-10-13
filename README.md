@@ -1,8 +1,6 @@
 # Corona codenames
 
-Emulates the game [Codenames](https://de.wikipedia.org/wiki/Codenames) to play remotely with friends via video conference. 
-
-The following image shows the game board. 
+Emulates the game [Codenames](https://de.wikipedia.org/wiki/Codenames) to play remotely with friends via video conference. The following image shows the game board:
 
 ![Board](board.png)
 
