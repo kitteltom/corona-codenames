@@ -1,8 +1,6 @@
 # Corona codenames
 
-Emulates the game [Codenames](https://de.wikipedia.org/wiki/Codenames) to play remotely with friends via video conference. 
-
-The following image shows the game board. 
+Emulates the game [Codenames](https://de.wikipedia.org/wiki/Codenames) to play remotely with friends via video conference. The following image shows the game board:
 
 ![Board](board.png)
 
@@ -12,7 +10,7 @@ The game was developed and testet with Python3.7 on MacOS.
 After cloning this repository you can launch the game with
 
 ```bash
-python corona_codenames.py -f 20 -v 0 -c path/to/your/desired/cloud/folder
+python corona_codenames.py -f 20 -v 0 -c 'path/to/your/desired/cloud/folder'
 ```
 
 where `-f` sets the desired font size and therefore the size of the game-window, `-v` sets the current version of the game and `-c` sets the path to a folder that is synced with a cloud. 
