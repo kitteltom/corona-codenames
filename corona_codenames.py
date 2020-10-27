@@ -10,22 +10,27 @@ import csv
 import argparse
 
 """
-Emulates the game 'Codenames' to play remotely with friends via video conference. 
+Emulates the game 'Codenames' to play remotely with friends via video
+conference.
 """
 
 # parser for command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--font_size', type=int, default=20,
-                    help='Font size of the words in the game. Change to make game better visible for other players. '
-                         'Note: This also changes the overall size of the game window.')
+                    help='Font size of the words in the game. Change to make'
+                         'game better visible for other players. Note: This'
+                         'also changes the overall size of the game window.')
 parser.add_argument('-d', '--data_path', default='dat',
-                    help='Path to the csv-file where the available words for the game are saved.')
+                    help='Path to the csv-file where the available words for'
+                         'the game are saved.')
 parser.add_argument('-c', '--cloud_path', default='~/Dropbox/CoronaCodenames',
-                    help='Path to save the image for the intelligence chiefs. Ideally this is a synced cloud folder, '
-                         'which can be shared with other players.')
+                    help='Path to save the image for the intelligence chiefs.'
+                         'Ideally this is a synced cloud folder, which can be'
+                         'shared with other players.')
 parser.add_argument('-v', '--version', type=int, default=0,
-                    help='Version number in the naming of the image for the intelligence chiefs. '
-                         'Helpful when playing several rounds in a row.')
+                    help='Version number in the naming of the image for the'
+                         'intelligence chiefs. Helpful when playing several'
+                         'rounds in a row.')
 
 # set colors and their rgb-code
 red = 'red3'
@@ -50,7 +55,10 @@ def launch_game(args):
     codenames_path = os.path.join(data_path, 'codenames.csv')
     used_names_path = os.path.join(data_path, 'used_names.csv')
     image_path = os.path.expanduser(args.cloud_path)
-    image_path = os.path.join(image_path, 'Farbzuordnung_v%d.png' % args.version)
+    image_path = os.path.join(
+        image_path,
+        'Farbzuordnung_v%d.png' % args.version
+        )
 
     # size of the game (number of cards in a row/column)
     board_size = 5
@@ -85,7 +93,10 @@ def launch_game(args):
     board_color_array = np.reshape(board_color_array, (board_size, board_size))
 
     # create the image for the intelligence chiefs
-    board_color_image = np.zeros(shape=(board_size*100, board_size*100, 3), dtype=np.uint8)
+    board_color_image = np.zeros(
+        shape=(board_size*100, board_size*100, 3),
+        dtype=np.uint8
+        )
     for row in range(board_color_image.shape[0]):
         for col in range(board_color_image.shape[1]):
             if row % 100 < 5 or row % 100 > 94:
@@ -93,7 +104,9 @@ def launch_game(args):
             elif col % 100 < 5 or col % 100 > 94:
                 board_color_image[row, col] = color_code['grey']
             else:
-                board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
+                board_color_image[row, col] = color_code[
+                    board_color_array[row // 100, col // 100]
+                    ]
     board_color_image = Image.fromarray(board_color_image, 'RGB')
     board_color_image.save(image_path, 'PNG')
 
@@ -141,7 +154,15 @@ def launch_game(args):
     # sets up the GUI
     root = tk.Tk()
     root.title("CoronaCodenames")
-    app = App(root, font_size, board_size, nr_red_agents, nr_blue_agents, word_array, board_color_array)
+    App(
+        root,
+        font_size,
+        board_size,
+        nr_red_agents,
+        nr_blue_agents,
+        word_array,
+        board_color_array
+        )
     root.mainloop()
 
 
@@ -175,7 +196,8 @@ class App:
     builds the GUI for the game
     """
 
-    def __init__(self, master, font_size, board_size, nr_red_agents, nr_blue_agents, word_array, board_color_array):
+    def __init__(self, master, font_size, board_size, nr_red_agents,
+                 nr_blue_agents, word_array, board_color_array):
 
         frame = tk.Frame(master)
         frame.pack()
@@ -191,49 +213,84 @@ class App:
         self.game_over = False
 
         # buttons for the word-cards
-        self.button_array = np.empty(shape=(board_size, board_size), dtype=tk.Button)
+        self.button_array = np.empty(
+            shape=(board_size, board_size),
+            dtype=tk.Button
+            )
         for row in range(word_array.shape[0]):
             for col in range(word_array.shape[1]):
-                self.button_array[row, col] = tk.Button(frame,
-                                                        text=word_array[row, col],
-                                                        width=14,
-                                                        height=5,
-                                                        fg=black,
-                                                        highlightthickness=4,
-                                                        font=("Courier", self.font_size, 'bold'),
-                                                        command=lambda r=row, c=col: self.callback(r, c,
-                                                                                                   board_color_array))
-                self.button_array[row, col].grid(row=row, column=col, padx=self.padx, pady=self.pady)
+                self.button_array[row, col] = tk.Button(
+                    frame,
+                    text=word_array[row, col],
+                    width=14,
+                    height=5,
+                    fg=black,
+                    highlightthickness=4,
+                    font=("Courier", self.font_size, 'bold'),
+                    command=lambda r=row, c=col: self.callback(
+                        r,
+                        c,
+                        board_color_array
+                        )
+                    )
+                self.button_array[row, col].grid(
+                    row=row,
+                    column=col,
+                    padx=self.padx,
+                    pady=self.pady
+                    )
 
         # label for the remaining cards of team red
-        self.red_label = tk.Label(frame,
-                                  text='ROT: ' + str(self.red_cnt),
-                                  fg=red,
-                                  anchor='w',
-                                  width=12,
-                                  height=2,
-                                  font=("Courier", self.font_size, 'bold'))
-        self.red_label.grid(row=board_size, column=0, padx=self.padx, pady=self.pady)
+        self.red_label = tk.Label(
+            frame,
+            text='ROT: ' + str(self.red_cnt),
+            fg=red,
+            anchor='w',
+            width=12,
+            height=2,
+            font=("Courier", self.font_size, 'bold')
+            )
+        self.red_label.grid(
+            row=board_size,
+            column=0,
+            padx=self.padx,
+            pady=self.pady
+            )
 
         # label for the remaining cards of team blue
-        self.blue_label = tk.Label(frame,
-                                   text='BLAU: ' + str(self.blue_cnt),
-                                   fg=blue,
-                                   anchor='w',
-                                   width=12,
-                                   height=2,
-                                   font=("Courier", self.font_size, 'bold'))
-        self.blue_label.grid(row=board_size, column=1, padx=self.padx, pady=self.pady)
+        self.blue_label = tk.Label(
+            frame,
+            text='BLAU: ' + str(self.blue_cnt),
+            fg=blue,
+            anchor='w',
+            width=12,
+            height=2,
+            font=("Courier", self.font_size, 'bold')
+            )
+        self.blue_label.grid(
+            row=board_size,
+            column=1,
+            padx=self.padx,
+            pady=self.pady
+            )
 
         # label for game termination
-        self.winner_label = tk.Label(frame,
-                                     text='',
-                                     fg=black,
-                                     anchor='e',
-                                     width=24,
-                                     height=2,
-                                     font=("Courier", self.font_size, 'bold'))
-        self.winner_label.grid(row=board_size, column=board_size-2, columnspan=2, padx=self.padx, pady=self.pady)
+        self.winner_label = tk.Label(
+            frame,
+            text='',
+            fg=black,
+            anchor='e',
+            width=24,
+            height=2,
+            font=("Courier", self.font_size, 'bold')
+            )
+        self.winner_label.grid(
+            row=board_size,
+            column=board_size-2,
+            columnspan=2,
+            padx=self.padx,
+            pady=self.pady
+            )
 
     def callback(self, row, col, board_color_array):
         """
@@ -250,8 +307,10 @@ class App:
         current_color = board_color_array[row, col]
 
         # change button color (text and border)
-        self.button_array[row, col].configure(fg=current_color,
-                                              highlightbackground=current_color)
+        self.button_array[row, col].configure(
+            fg=current_color,
+            highlightbackground=current_color
+            )
 
         # decrease the counts for the remaining cards
         if current_color == red:
@@ -267,7 +326,7 @@ class App:
                 self.winner_label.configure(text='Blau gewinnt! :) ')
                 self.game_over = True
         elif current_color == black and not self.game_over:
-            self.winner_label.configure(text='TOD!!! ')
+            self.winner_label.configure(text='TOT!!! ')
             self.game_over = True
 
 
