@@ -55,10 +55,7 @@ def launch_game(args):
     codenames_path = os.path.join(data_path, 'codenames.csv')
     used_names_path = os.path.join(data_path, 'used_names.csv')
     image_path = os.path.expanduser(args.cloud_path)
-    image_path = os.path.join(
-        image_path,
-        'Farbzuordnung_v%d.png' % args.version
-        )
+    image_path = os.path.join(image_path, 'Farbzuordnung_v%d.png' % args.version)
 
     # size of the game (number of cards in a row/column)
     board_size = 5
@@ -93,10 +90,7 @@ def launch_game(args):
     board_color_array = np.reshape(board_color_array, (board_size, board_size))
 
     # create the image for the intelligence chiefs
-    board_color_image = np.zeros(
-        shape=(board_size*100, board_size*100, 3),
-        dtype=np.uint8
-        )
+    board_color_image = np.zeros(shape=(board_size*100, board_size*100, 3), dtype=np.uint8)
     for row in range(board_color_image.shape[0]):
         for col in range(board_color_image.shape[1]):
             if row % 100 < 5 or row % 100 > 94:
@@ -104,9 +98,7 @@ def launch_game(args):
             elif col % 100 < 5 or col % 100 > 94:
                 board_color_image[row, col] = color_code['grey']
             else:
-                board_color_image[row, col] = color_code[
-                    board_color_array[row // 100, col // 100]
-                    ]
+                board_color_image[row, col] = color_code[board_color_array[row // 100, col // 100]]
     board_color_image = Image.fromarray(board_color_image, 'RGB')
     board_color_image.save(image_path, 'PNG')
 
@@ -196,8 +188,7 @@ class App:
     builds the GUI for the game
     """
 
-    def __init__(self, master, font_size, board_size, nr_red_agents,
-                 nr_blue_agents, word_array, board_color_array):
+    def __init__(self, master, font_size, board_size, nr_red_agents, nr_blue_agents, word_array, board_color_array):
 
         frame = tk.Frame(master)
         frame.pack()
@@ -227,18 +218,14 @@ class App:
                     fg=black,
                     highlightthickness=4,
                     font=("Courier", self.font_size, 'bold'),
-                    command=lambda r=row, c=col: self.callback(
-                        r,
-                        c,
-                        board_color_array
-                        )
-                    )
+                    command=lambda r=row, c=col: self.callback(r, c, board_color_array)
+                )
                 self.button_array[row, col].grid(
                     row=row,
                     column=col,
                     padx=self.padx,
                     pady=self.pady
-                    )
+                )
 
         # label for the remaining cards of team red
         self.red_label = tk.Label(
@@ -249,13 +236,13 @@ class App:
             width=12,
             height=2,
             font=("Courier", self.font_size, 'bold')
-            )
+        )
         self.red_label.grid(
             row=board_size,
             column=0,
             padx=self.padx,
             pady=self.pady
-            )
+        )
 
         # label for the remaining cards of team blue
         self.blue_label = tk.Label(
@@ -266,13 +253,13 @@ class App:
             width=12,
             height=2,
             font=("Courier", self.font_size, 'bold')
-            )
+        )
         self.blue_label.grid(
             row=board_size,
             column=1,
             padx=self.padx,
             pady=self.pady
-            )
+        )
 
         # label for game termination
         self.winner_label = tk.Label(
@@ -283,14 +270,14 @@ class App:
             width=24,
             height=2,
             font=("Courier", self.font_size, 'bold')
-            )
+        )
         self.winner_label.grid(
             row=board_size,
             column=board_size-2,
             columnspan=2,
             padx=self.padx,
             pady=self.pady
-            )
+        )
 
     def callback(self, row, col, board_color_array):
         """
@@ -310,7 +297,7 @@ class App:
         self.button_array[row, col].configure(
             fg=current_color,
             highlightbackground=current_color
-            )
+        )
 
         # decrease the counts for the remaining cards
         if current_color == red:
